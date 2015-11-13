@@ -64,6 +64,7 @@ public class Question2_1 {
 					tagAndFrecuency.put(v.toString(), 1);
 				}
 			}
+			//
 			tagf=tagAndFrecuency;
 			for (String key : tagAndFrecuency.keySet()) {
 				value = new StringAndInt(key, tagAndFrecuency.get(key));
