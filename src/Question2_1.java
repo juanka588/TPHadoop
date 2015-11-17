@@ -17,8 +17,8 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 public class Question2_1 {
 	private static final String TAG = Question2_1.class.getSimpleName();
-	
-	public static HashMap<String, Integer> tagf; 
+
+	public static HashMap<String, Integer> tagf;
 
 	public static class MyMapper extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -37,7 +37,8 @@ public class Question2_1 {
 				key.set(country.toString());
 				for (String tag : tags.split(",")) {
 					value.set(tag);
-//					System.out.println("lat " + lat + " lon " + lon + " tags " + tags + " country " + key.toString());
+					// System.out.println("lat " + lat + " lon " + lon + " tags
+					// " + tags + " country " + key.toString());
 					context.write(key, value);
 				}
 			}
@@ -52,22 +53,25 @@ public class Question2_1 {
 		protected void reduce(Text country, Iterable<Text> tags, Context context)
 				throws IOException, InterruptedException {
 
-			HashMap<String, Integer> tagAndFrecuency = new HashMap<>();
+			//HashMap qui contient (tag, nbOccurencesTag)
+			HashMap<String, Integer> tagAndFrequency = new HashMap<>();
+//			for(Text tag : tags){
+//				System.out.println("tag : "+tag.toString());
+//			}
+			
 			for (Text v : tags) {
-				System.out.println(country.toString()+" "+v);
-				if (tagAndFrecuency.containsValue(v)) {
-					int f = tagAndFrecuency.get(v);
-					System.out.println("freq "+f);
-					f++;
-					tagAndFrecuency.put(v.toString(), 10);
+				if(v.toString() != null){
+				if (tagAndFrequency.containsKey(v.toString())) {
+					tagAndFrequency.put(v.toString(), tagAndFrequency.get(v.toString())+1);
 				} else {
-					tagAndFrecuency.put(v.toString(), 1);
-				}
+					tagAndFrequency.put(v.toString(), 1);
+				}		
 			}
-			//
-			tagf=tagAndFrecuency;
-			for (String key : tagAndFrecuency.keySet()) {
-				value = new StringAndInt(key, tagAndFrecuency.get(key));
+			}
+
+			tagf=tagAndFrequency;
+			for (String key : tagAndFrequency.keySet()) {
+				value = new StringAndInt(key, tagAndFrequency.get(key));
 				context.write(country, value);
 			}
 
