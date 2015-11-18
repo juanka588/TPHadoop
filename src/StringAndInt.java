@@ -36,7 +36,7 @@ public class StringAndInt implements Writable, Comparable<StringAndInt> {
 
 	@Override
 	public int compareTo(StringAndInt o) {
-		return nOccurrences - o.nOccurrences;
+		return o.nOccurrences - nOccurrences;
 	}
 
 	@Override
@@ -50,10 +50,11 @@ public class StringAndInt implements Writable, Comparable<StringAndInt> {
 		// TODO Auto-generated method stub
 
 	}
+
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return pays+" "+nOccurrences;
+		return pays + " " + nOccurrences;
 	}
 
 }

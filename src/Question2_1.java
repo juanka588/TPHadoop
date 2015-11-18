@@ -1,9 +1,10 @@
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.PriorityQueue;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -19,6 +20,7 @@ public class Question2_1 {
 	private static final String TAG = Question2_1.class.getSimpleName();
 
 	public static HashMap<String, Integer> tagf;
+	public static int k = 0;
 
 	public static class MyMapper extends Mapper<LongWritable, Text, Text, Text> {
 
@@ -36,9 +38,7 @@ public class Question2_1 {
 			if (country != null) {
 				key.set(country.toString());
 				for (String tag : tags.split(",")) {
-					value.set(tag);
-					// System.out.println("lat " + lat + " lon " + lon + " tags
-					// " + tags + " country " + key.toString());
+					value.set(URLDecoder.decode(tag));
 					context.write(key, value);
 				}
 			}
@@ -53,28 +53,29 @@ public class Question2_1 {
 		protected void reduce(Text country, Iterable<Text> tags, Context context)
 				throws IOException, InterruptedException {
 
-			//HashMap qui contient (tag, nbOccurencesTag)
+			// HashMap qui contient (tag, nbOccurencesTag)
 			HashMap<String, Integer> tagAndFrequency = new HashMap<>();
-//			for(Text tag : tags){
-//				System.out.println("tag : "+tag.toString());
-//			}
-			
 			for (Text v : tags) {
-				if(v.toString() != null){
-				if (tagAndFrequency.containsKey(v.toString())) {
-					tagAndFrequency.put(v.toString(), tagAndFrequency.get(v.toString())+1);
-				} else {
-					tagAndFrequency.put(v.toString(), 1);
-				}		
+				if (v.toString() != null) {
+					if (tagAndFrequency.containsKey(v.toString())) {
+						tagAndFrequency.put(v.toString(), tagAndFrequency.get(v.toString()) + 1);
+					} else {
+						tagAndFrequency.put(v.toString(), 1);
+					}
+				}
 			}
-			}
-
-			tagf=tagAndFrequency;
+			PriorityQueue<StringAndInt> order = new PriorityQueue<>();
+			tagf = tagAndFrequency;
 			for (String key : tagAndFrequency.keySet()) {
-				value = new StringAndInt(key, tagAndFrequency.get(key));
+				order.add(new StringAndInt(key, tagAndFrequency.get(key)));
+			}
+			for (int i = 0; i < k; i++) {
+				value = order.poll();
+				if (value == null) {
+					break;
+				}
 				context.write(country, value);
 			}
-
 		}
 	}
 
@@ -83,7 +84,7 @@ public class Question2_1 {
 		String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 		String input = otherArgs[0];
 		String output = otherArgs[1];
-		int k = Integer.parseInt(otherArgs[2]);
+		k = Integer.parseInt(otherArgs[2]);
 
 		Job job = Job.getInstance(conf, TAG);
 		job.setJarByClass(Question2_1.class);
@@ -107,9 +108,16 @@ public class Question2_1 {
 
 		job.waitForCompletion(true);
 		for (String key : tagf.keySet()) {
-			int val=tagf.get(key);
-			System.out.println(key+" "+val );
+			int val = tagf.get(key);
+			System.out.println(key + " " + val);
 		}
-		
+		PriorityQueue<StringAndInt> order = new PriorityQueue<>();
+		for (String key : tagf.keySet()) {
+			order.add(new StringAndInt(key, tagf.get(key)));
+		}
+		for (int i = 0; i < k; i++) {
+			System.out.println(order.poll());
+		}
+
 	}
 }
