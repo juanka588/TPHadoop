@@ -2,28 +2,35 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
 public class StringAndInt implements Writable, Comparable<StringAndInt> {
-	private String pays;
+	private String tag;
 	private int nOccurrences;
+	public static String split = "----";
 
 	public StringAndInt() {
-		this("", 0);
 	}
 
 	public StringAndInt(String stringContent, int intContent) {
 		super();
-		this.pays = stringContent;
+		this.tag = stringContent;
 		this.nOccurrences = intContent;
 	}
 
+	public StringAndInt(Text txt) {
+		String cad[] = txt.toString().split(split);
+		this.tag = cad[0];
+		this.nOccurrences = Integer.parseInt(cad[1]);
+	}
+
 	public String getStringContent() {
-		return pays;
+		return tag;
 	}
 
 	public void setStringContent(String stringContent) {
-		this.pays = stringContent;
+		this.tag = stringContent;
 	}
 
 	public int getIntContent() {
@@ -40,21 +47,21 @@ public class StringAndInt implements Writable, Comparable<StringAndInt> {
 	}
 
 	@Override
-	public void readFields(DataInput arg0) throws IOException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void write(DataOutput arg0) throws IOException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return pays + " " + nOccurrences;
+		return tag + split + nOccurrences;
+	}
+
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		// nOccurrences=in.readInt();
+		// pays=in.readLine();
+	}
+
+	@Override
+	public void write(DataOutput out) throws IOException {
+//		out.writeInt(nOccurrences);
+//		out.writeChars(tag);
 	}
 
 }

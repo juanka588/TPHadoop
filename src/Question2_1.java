@@ -38,8 +38,11 @@ public class Question2_1 {
 			if (country != null) {
 				key.set(country.toString());
 				for (String tag : tags.split(",")) {
-					value.set(URLDecoder.decode(tag));
-					context.write(key, value);
+					String cad = URLDecoder.decode(tag);
+					if (!cad.equals(" ")) {
+						value.set(cad);
+						context.write(key, value);
+					}
 				}
 			}
 		}
@@ -55,7 +58,7 @@ public class Question2_1 {
 
 			Configuration conf = context.getConfiguration();
 			int k = Integer.parseInt(conf.get("k"));
-			
+
 			// HashMap qui contient (tag, nbOccurencesTag)
 			HashMap<String, Integer> tagAndFrequency = new HashMap<>();
 			for (Text v : tags) {
@@ -110,17 +113,6 @@ public class Question2_1 {
 		job.setOutputFormatClass(TextOutputFormat.class);
 
 		job.waitForCompletion(true);
-//		for (String key : tagf.keySet()) {
-//			int val = tagf.get(key);
-//			System.out.println(key + " " + val);
-//		}
-//		PriorityQueue<StringAndInt> order = new PriorityQueue<>();
-//		for (String key : tagf.keySet()) {
-//			order.add(new StringAndInt(key, tagf.get(key)));
-//		}
-//		for (int i = 0; i < k; i++) {
-//			System.out.println(order.poll());
-//		}
 
 	}
 }
