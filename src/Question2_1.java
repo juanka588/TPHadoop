@@ -53,6 +53,9 @@ public class Question2_1 {
 		protected void reduce(Text country, Iterable<Text> tags, Context context)
 				throws IOException, InterruptedException {
 
+			Configuration conf = context.getConfiguration();
+			int k = Integer.parseInt(conf.get("k"));
+			
 			// HashMap qui contient (tag, nbOccurencesTag)
 			HashMap<String, Integer> tagAndFrequency = new HashMap<>();
 			for (Text v : tags) {
@@ -84,7 +87,7 @@ public class Question2_1 {
 		String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 		String input = otherArgs[0];
 		String output = otherArgs[1];
-		k = Integer.parseInt(otherArgs[2]);
+		conf.set("k", otherArgs[2]);
 
 		Job job = Job.getInstance(conf, TAG);
 		job.setJarByClass(Question2_1.class);
@@ -107,17 +110,17 @@ public class Question2_1 {
 		job.setOutputFormatClass(TextOutputFormat.class);
 
 		job.waitForCompletion(true);
-		for (String key : tagf.keySet()) {
-			int val = tagf.get(key);
-			System.out.println(key + " " + val);
-		}
-		PriorityQueue<StringAndInt> order = new PriorityQueue<>();
-		for (String key : tagf.keySet()) {
-			order.add(new StringAndInt(key, tagf.get(key)));
-		}
-		for (int i = 0; i < k; i++) {
-			System.out.println(order.poll());
-		}
+//		for (String key : tagf.keySet()) {
+//			int val = tagf.get(key);
+//			System.out.println(key + " " + val);
+//		}
+//		PriorityQueue<StringAndInt> order = new PriorityQueue<>();
+//		for (String key : tagf.keySet()) {
+//			order.add(new StringAndInt(key, tagf.get(key)));
+//		}
+//		for (int i = 0; i < k; i++) {
+//			System.out.println(order.poll());
+//		}
 
 	}
 }
