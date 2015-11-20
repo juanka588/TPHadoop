@@ -18,10 +18,6 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 public class Question2_1 {
 	private static final String TAG = Question2_1.class.getSimpleName();
-
-	public static HashMap<String, Integer> tagf;
-	public static int k = 0;
-
 	public static class MyMapper extends Mapper<LongWritable, Text, Text, Text> {
 
 		private Text key = new Text();
@@ -38,6 +34,7 @@ public class Question2_1 {
 			if (country != null) {
 				key.set(country.toString());
 				for (String tag : tags.split(",")) {
+					@SuppressWarnings("deprecation")
 					String cad = URLDecoder.decode(tag);
 					if (!cad.equals(" ")) {
 						value.set(cad);
@@ -71,7 +68,6 @@ public class Question2_1 {
 				}
 			}
 			PriorityQueue<StringAndInt> order = new PriorityQueue<>();
-			tagf = tagAndFrequency;
 			for (String key : tagAndFrequency.keySet()) {
 				order.add(new StringAndInt(key, tagAndFrequency.get(key)));
 			}
@@ -98,9 +94,6 @@ public class Question2_1 {
 		job.setMapperClass(MyMapper.class);
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(Text.class);
-
-		// job.setCombinerClass(MyReducer.class);
-		// job.setNumReduceTasks(3);
 
 		job.setReducerClass(MyReducer.class);
 		job.setOutputKeyClass(Text.class);

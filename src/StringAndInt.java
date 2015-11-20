@@ -3,9 +3,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableComparable;
 
-public class StringAndInt implements Writable, Comparable<StringAndInt> {
+public class StringAndInt implements WritableComparable<StringAndInt> {
 	private String tag;
 	private int nOccurrences;
 	public static String split = "----";
@@ -20,6 +20,7 @@ public class StringAndInt implements Writable, Comparable<StringAndInt> {
 	}
 
 	public StringAndInt(Text txt) {
+		super();
 		String cad[] = txt.toString().split(split);
 		this.tag = cad[0];
 		this.nOccurrences = Integer.parseInt(cad[1]);
@@ -60,8 +61,8 @@ public class StringAndInt implements Writable, Comparable<StringAndInt> {
 
 	@Override
 	public void write(DataOutput out) throws IOException {
-//		out.writeInt(nOccurrences);
-//		out.writeChars(tag);
+		out.writeInt(nOccurrences);
+		out.writeChars(tag);
 	}
 
 }
