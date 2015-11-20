@@ -47,10 +47,12 @@ public class StringAndInt implements WritableComparable<StringAndInt> {
 		return o.nOccurrences - nOccurrences;
 	}
 
+	/**
+	 * warning with use this method
+	 */
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return tag + split + nOccurrences;
+		return tag + " " + nOccurrences;
 	}
 
 	@Override
