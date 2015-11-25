@@ -1,2 +1,66 @@
-1.1 Execution Locale:
-1.-> 
+Etudiants : 
+Juan Camilo Rodriguez Duran
+Mitan Ioana Marina
+
+Réponses : 
+------------------------------------------------------1.1-------------------------------------------------------
+1. 
+Map input : nb de lignes dans le fichier (qui contiennent les clés)
+Map output records : nb total de clés dans le fichier
+	
+2. La sortie du fichier après avoir fait le map est la même que l’entrée sur laquelle on va faire le reduce.
+
+3. reduce input groups représente le nombre de clés uniques.
+
+------------------------------------------------------1.2-------------------------------------------------------
+ Chemin HDFS sur le répertoire personnel : 
+	/user/<identifiant>
+
+------------------------------------------------------1.3-------------------------------------------------------
+Chaque split correspond à un fichier (nb de splits : 5).
+
+------------------------------------------------------1.4-------------------------------------------------------
+La différence entre les deux méthodes est que, en utilisant le combine, on fait plus d’opérations, mais on utilise moins d’espace mémoire, parce que, pendant la phase de “combine” un résultat intermédiaire est produit, qui réduit le nb d’entrées pour le reduce.
+
+Les compteurs combine input records et combine output records nous permettent de vérifier que le combiner a bien fonctionne, car ces compteurs gardent la valeur 0 quand on n’utilise pas le combiner. Quand on utilise ce dernier, les compteurs nous affichent le nombre d’entrées utilises pendant la phase de combine. 
+
+Les compteurs qui permettent de vérifier le gain et comparaison entre le fait d’utiliser ou pas le combiner :
+
+                                                       sans combine     | 	avec combine
+__________________________________________________________________
+              bytes read                  | 	  5.063.675	| 	1.303.830
+            bytes written                 | 	10.609.189 	| 	3.251.683
+map output materialised bytes | 	  5.063.699 	| 	1.303.902
+     reduce input records           | 	     421.739	| 	     85.301
+          spilled records                | 	     843.478 	| 	   170.602
+
+
+4. Le mot le plus utilise dans “Les Misérables” est le mot “de” avec 16.757 occurrences.
+
+
+
+
+
+-----------------------------------------------------2.2--------------------------------------------------------
+Comme données intermédiaires on aura chaque pays comme clé avec tous les tags et le nombre d’occurrences associées a chacun comme élément correspondant, de type Text a partir duquel on crée des objets de type StringAndInt. 
+Les 5 tags les plus utilises en France (nous avons exclu le tag vide) : 
+	france : 563
+	spain : 113
+	europe : 75
+	espana : 70
+	bretagne : 67
+
+3. Dans ce cas-la le problème est qu’on peut se retrouver dans un cas ou la taille des données manipules est plus grande que la taille maximale d’une HashMap.
+
+------------------------------------------------------3---------------------------------------------------------
+
+Question préliminaire : 
+job 1 : lit le Long writable
+		split du looong string
+tri des tags
+		renvoie un fichier avec 2 colonnes : pays (id), tag
+job 2 : map normal avec l’entree recuperee
+	compter le nb de tags
+	tri en fonction de la frequence
+
+
