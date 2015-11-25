@@ -2,12 +2,13 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
 
 public class StringAndInt implements WritableComparable<StringAndInt> {
-	private String tag;
-	private int nOccurrences;
+	private Text tag;
+	private IntWritable nOccurrences;
 	public static String split = "----";
 
 	public StringAndInt() {
@@ -15,36 +16,30 @@ public class StringAndInt implements WritableComparable<StringAndInt> {
 
 	public StringAndInt(String stringContent, int intContent) {
 		super();
-		this.tag = stringContent;
-		this.nOccurrences = intContent;
+		this.tag=new Text(stringContent);
+		this.nOccurrences=new IntWritable(intContent);
 	}
 
-	public StringAndInt(Text txt) {
-		super();
-		String cad[] = txt.toString().split(split);
-		this.tag = cad[0];
-		this.nOccurrences = Integer.parseInt(cad[1]);
-	}
 
 	public String getStringContent() {
-		return tag;
+		return tag.toString();
 	}
 
-	public void setStringContent(String stringContent) {
+	public void setStringContent(Text stringContent) {
 		this.tag = stringContent;
 	}
 
 	public int getIntContent() {
-		return nOccurrences;
+		return nOccurrences.get();
 	}
 
-	public void setIntContent(int intContent) {
+	public void setIntContent(IntWritable intContent) {
 		this.nOccurrences = intContent;
 	}
 
 	@Override
 	public int compareTo(StringAndInt o) {
-		return o.nOccurrences - nOccurrences;
+		return o.nOccurrences.get() - nOccurrences.get();
 	}
 
 	/**
@@ -57,14 +52,14 @@ public class StringAndInt implements WritableComparable<StringAndInt> {
 
 	@Override
 	public void readFields(DataInput in) throws IOException {
-		// nOccurrences=in.readInt();
-		// pays=in.readLine();
+		nOccurrences.readFields(in);
+		tag.readFields(in);
 	}
 
 	@Override
 	public void write(DataOutput out) throws IOException {
-		out.writeInt(nOccurrences);
-		out.writeChars(tag);
+		nOccurrences.write(out);
+		tag.write(out);
 	}
 
 }
