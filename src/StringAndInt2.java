@@ -7,18 +7,18 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.WritableComparator;
 
-public class StringAndInt extends WritableComparator implements WritableComparable<StringAndInt> {
+public class StringAndInt2 extends WritableComparator implements WritableComparable<StringAndInt2> {
 	private Text tag;
 	private IntWritable nOccurrences;
 	public static String split = "----";
 
-	public StringAndInt() {
+	public StringAndInt2() {
 		//super(StringAndInt.class,true);
 		this.tag=new Text();
 		this.nOccurrences=new IntWritable();
 	}
 
-	public StringAndInt(String stringContent, int intContent) {
+	public StringAndInt2(String stringContent, int intContent) {
 		this.tag=new Text(stringContent);
 		this.nOccurrences=new IntWritable(intContent);
 	}
@@ -41,8 +41,8 @@ public class StringAndInt extends WritableComparator implements WritableComparab
 	}
 
 	@Override
-	public int compareTo(StringAndInt o) {
-		return o.nOccurrences.get() - nOccurrences.get();
+	public int compareTo(StringAndInt2 o) {
+		return o.tag.toString().compareTo(tag.toString());
 	}
 	
 	/**

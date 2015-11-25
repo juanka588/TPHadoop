@@ -1,22 +1,19 @@
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.PriorityQueue;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
@@ -58,9 +55,6 @@ public class Question3_1 {
 		protected void reduce(PaysTag country, Iterable<IntWritable> tagsF, Context context)
 				throws IOException, InterruptedException {
 			int sum = 0;
-			Configuration conf = context.getConfiguration();
-			int k = Integer.parseInt(conf.get("k"));
-
 			for (IntWritable v : tagsF) {
 				sum += v.get();
 			}
@@ -81,10 +75,47 @@ public class Question3_1 {
 				sum += v.get();
 			}
 			value.set(sum);
-			System.out.println(country + "" + value.get());
+			System.out.println(country + " " + value.get());
 			context.write(country, value);
 		}
 
+	}
+
+	public static class MyMapper2 extends Mapper<PaysTag, IntWritable, StringAndInt2, Text> {
+
+		@Override
+		protected void map(PaysTag countryTag, IntWritable freq, Context context)
+				throws IOException, InterruptedException {
+
+			StringAndInt2 key = new StringAndInt2(countryTag.getPays().toString(), freq.get());
+			Text value = countryTag.getTag();
+			System.out.println(key+" "+value);
+			context.write(key, value);
+		}
+	}
+
+	public static class MyReducer2 extends Reducer<StringAndInt2, Text, Text, StringAndInt> {
+
+		private Text key = new Text();
+		private StringAndInt value;
+
+		@Override
+		protected void reduce(StringAndInt2 countryFreq, Iterable<Text> tags, Context context)
+				throws IOException, InterruptedException {
+
+			Configuration conf = context.getConfiguration();
+			int k = Integer.parseInt(conf.get("k"));
+			System.out.println(countryFreq);
+
+			key.set(countryFreq.getStringContent());
+
+			for (Text v : tags) {
+				value = new StringAndInt(v.toString(), countryFreq.getIntContent());
+				System.out.println(v.toString());
+				context.write(key, value);
+			}
+
+		}
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -101,8 +132,8 @@ public class Question3_1 {
 		job.setMapOutputKeyClass(PaysTag.class);
 		job.setMapOutputValueClass(IntWritable.class);
 
-		job.setGroupingComparatorClass(PaysTag.class);
-		job.setSortComparatorClass(StringAndInt.class);
+		 //job.setGroupingComparatorClass(PaysTag.class);
+		// job.setSortComparatorClass(StringAndInt.class);
 
 		job.setCombinerClass(MyCombiner.class);
 		job.setNumReduceTasks(3);
@@ -114,35 +145,36 @@ public class Question3_1 {
 		FileInputFormat.addInputPath(job, new Path(input));
 		job.setInputFormatClass(TextInputFormat.class);
 
-		FileOutputFormat.setOutputPath(job, new Path(output));
-		job.setOutputFormatClass(TextOutputFormat.class);
-//
-//		job.waitForCompletion(true);
-//		Job job2 = Job.getInstance(conf, TAG);
-//		job2.setJarByClass(Question3_1.class);
-//
-//		job2.setMapperClass(MyMapper2.class);
-//		job2.setMapOutputKeyClass(Text.class);
-//		job2.setMapOutputValueClass(StringAndInt.class);
-//
-//		job2.setGroupingComparatorClass(PaysTag.class);
-//		job2.setSortComparatorClass(StringAndInt.class);
-//
-//		job2.setCombinerClass(MyCombiner.class);
-//		job2.setNumReduceTasks(3);
-//
-//		job2.setReducerClass(MyReducer.class);
-//		job2.setOutputKeyClass(PaysTag.class);
-//		job2.setOutputValueClass(IntWritable.class);
-//
-//		FileInputFormat.addInputPath(job2, new Path(input));
-//		job2.setInputFormatClass(TextInputFormat.class);
-//
-//		FileOutputFormat.setOutputPath(job2, new Path(output));
-//		job2.setOutputFormatClass(TextOutputFormat.class);
-//
-//		job2.waitForCompletion(true);
+		Path inter = new Path("inter");
+		FileOutputFormat.setOutputPath(job, inter);
+		job.setOutputFormatClass(SequenceFileOutputFormat.class);
 
+		job.waitForCompletion(true);
+
+		/* second job */
+
+		Job job2 = Job.getInstance(conf, TAG);
+		job2.setJarByClass(Question3_1.class);
+
+		job2.setMapperClass(MyMapper2.class);
+		job2.setMapOutputKeyClass(StringAndInt2.class);
+		job2.setMapOutputValueClass(Text.class);
+
+		
+		job2.setGroupingComparatorClass(FrequenceComparator.class);
+//		job.setSortComparatorClass(StringAndInt.class);
+
+		job2.setReducerClass(MyReducer2.class);
+		job2.setOutputKeyClass(Text.class);
+		job2.setOutputValueClass(StringAndInt.class);
+
+		FileInputFormat.addInputPath(job2, inter);
+		job2.setInputFormatClass(SequenceFileInputFormat.class);
+
+		FileOutputFormat.setOutputPath(job2, new Path(output));
+		job2.setOutputFormatClass(TextOutputFormat.class);
+
+		job2.waitForCompletion(true);
 
 	}
 }

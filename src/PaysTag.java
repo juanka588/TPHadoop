@@ -7,6 +7,7 @@ import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.WritableComparator;
 
 public class PaysTag extends WritableComparator implements WritableComparable<PaysTag> {
+
 	private Text pays;
 	private Text tag;
 
@@ -15,11 +16,27 @@ public class PaysTag extends WritableComparator implements WritableComparable<Pa
 		this.pays = new Text();
 		this.tag = new Text();
 	}
-	
+
 	public PaysTag(String pays, String tag) {
 		this.pays = new Text(pays);
 		this.tag = new Text(tag);
 
+	}
+
+	public Text getPays() {
+		return pays;
+	}
+
+	public void setPays(Text pays) {
+		this.pays = pays;
+	}
+
+	public Text getTag() {
+		return tag;
+	}
+
+	public void setTag(Text tag) {
+		this.tag = tag;
 	}
 
 	@Override
