@@ -5,15 +5,13 @@ import java.io.IOException;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
-import org.apache.hadoop.io.WritableComparator;
 
-public class StringAndInt extends WritableComparator implements WritableComparable<StringAndInt> {
+public class StringAndInt  implements WritableComparable<StringAndInt> {
 	private Text tag;
 	private IntWritable nOccurrences;
 	public static String split = "----";
 
 	public StringAndInt() {
-		//super(StringAndInt.class,true);
 		this.tag=new Text();
 		this.nOccurrences=new IntWritable();
 	}
@@ -42,7 +40,10 @@ public class StringAndInt extends WritableComparator implements WritableComparab
 
 	@Override
 	public int compareTo(StringAndInt o) {
-		return o.nOccurrences.get() - nOccurrences.get();
+		if(o.getStringContent().compareTo(this.getStringContent())==0){
+			return o.getIntContent()-this.getIntContent();
+		}
+		return o.getStringContent().compareTo(this.getStringContent());
 	}
 	
 	/**

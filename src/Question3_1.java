@@ -81,38 +81,43 @@ public class Question3_1 {
 
 	}
 
-	public static class MyMapper2 extends Mapper<PaysTag, IntWritable, StringAndInt2, Text> {
+	public static class MyMapper2 extends Mapper<PaysTag, IntWritable, StringAndInt, Text> {
 
 		@Override
 		protected void map(PaysTag countryTag, IntWritable freq, Context context)
 				throws IOException, InterruptedException {
 
-			StringAndInt2 key = new StringAndInt2(countryTag.getPays().toString(), freq.get());
+			StringAndInt key = new StringAndInt(countryTag.getPays().toString(), freq.get());
 			Text value = countryTag.getTag();
-			System.out.println(key+" "+value);
+			System.out.println(key + " " + value);
 			context.write(key, value);
 		}
 	}
 
-	public static class MyReducer2 extends Reducer<StringAndInt2, Text, Text, StringAndInt> {
+	public static class MyReducer2 extends Reducer<StringAndInt, Text, Text, StringAndInt> {
 
 		private Text key = new Text();
 		private StringAndInt value;
 
 		@Override
-		protected void reduce(StringAndInt2 countryFreq, Iterable<Text> tags, Context context)
+		protected void reduce(StringAndInt countryFreq, Iterable<Text> tags, Context context)
 				throws IOException, InterruptedException {
 
 			Configuration conf = context.getConfiguration();
 			int k = Integer.parseInt(conf.get("k"));
+
 			System.out.println(countryFreq);
 
 			key.set(countryFreq.getStringContent());
-
+			int i = 0;
 			for (Text v : tags) {
+				if (i >= k) {
+					return;
+				}
 				value = new StringAndInt(v.toString(), countryFreq.getIntContent());
 				System.out.println(v.toString());
 				context.write(key, value);
+				i++;
 			}
 
 		}
@@ -132,11 +137,13 @@ public class Question3_1 {
 		job.setMapOutputKeyClass(PaysTag.class);
 		job.setMapOutputValueClass(IntWritable.class);
 
-		 //job.setGroupingComparatorClass(PaysTag.class);
+		// job.setGroupingComparatorClass(PaysTag.class);
 		// job.setSortComparatorClass(StringAndInt.class);
 
 		job.setCombinerClass(MyCombiner.class);
-		job.setNumReduceTasks(3);
+		// job.setNumReduceTasks(3);
+
+		// job.setPartitionerClass(countryParticioner.class);
 
 		job.setReducerClass(MyReducer.class);
 		job.setOutputKeyClass(PaysTag.class);
@@ -157,12 +164,11 @@ public class Question3_1 {
 		job2.setJarByClass(Question3_1.class);
 
 		job2.setMapperClass(MyMapper2.class);
-		job2.setMapOutputKeyClass(StringAndInt2.class);
+		job2.setMapOutputKeyClass(StringAndInt.class);
 		job2.setMapOutputValueClass(Text.class);
 
-		
 		job2.setGroupingComparatorClass(FrequenceComparator.class);
-//		job.setSortComparatorClass(StringAndInt.class);
+		job2.setSortComparatorClass(SortComparator.class);
 
 		job2.setReducerClass(MyReducer2.class);
 		job2.setOutputKeyClass(Text.class);
