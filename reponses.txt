@@ -53,14 +53,32 @@ Les 5 tags les plus utilises en France (nous avons exclu le tag vide) :
 3. Dans ce cas-la le problème est qu’on peut se retrouver dans un cas ou la taille des données manipules est plus grande que la taille maximale d’une HashMap.
 
 ------------------------------------------------------3---------------------------------------------------------
+3. Dans ce cas-la le problème est qu’on peut se retrouver dans un cas ou la taille des données manipules est plus grande que la taille maximale d’une HashMap.
+
+------------------------------------------------------3---------------------------------------------------------
 
 Question préliminaire : 
-job 1 : lit le Long writable
-		split du looong string
-tri des tags
-		renvoie un fichier avec 2 colonnes : pays (id), tag
-job 2 : map normal avec l’entree recuperee
-	compter le nb de tags
-	tri en fonction de la frequence
 
+job 1 : 
+    Map input : LongWritable, Text
+    Map output :  PaysTag, IntWritable
+Combiner/reduce input : PaysTag, IntWritable
+Combiner/reduce output : PaysTag, IntWritable
 
+job 2 :
+    Map input : PaysTag, IntWritable 
+    Map output : StringAndInt, Text
+reduce input : StringAndInt, Text
+educe output : Text, StringAndInt
+
+où LongWritable représente le numéro de ligne du fichier, Text représente le contenu de la ligne, PaysTag est un objet dans lequel on garde l’association entre un pays et un tag, StringAndInt est un objet dans lequel on a un pays et la frequence des tags.
+
+Pour le deuxième job, pour le découpage en groupes nous avons implementé la la methode compare dans la classe CountryComparator, qui compare deux pays pour voir s’il s’agit du même.
+
+Pour le tri, nous avons implementé dans la classe SortComparator la methode compare qui compare deux pays et dans le cas où ils sont equivalents, elle compare la frequence des tags.
+
+Question :
+    Nous n’avons plus besoin d’une structure de données, comme une HashMap dans les questions antérieures, en economisant beaucoup d’espace memoire.
+
+Question :
+Comme pour le même pays le tri des tags se fait dans l’ordre alphabetique, si on a deux tags avec la même frequence, le résultat sera toujours le même. 
