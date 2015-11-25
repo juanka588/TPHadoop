@@ -74,7 +74,7 @@ public class Question2_2 {
 					}
 				}
 			}
-			
+
 			PriorityQueue<StringAndInt> order = new PriorityQueue<>();
 			for (String key : tagAndFrequency.keySet()) {
 				StringAndInt v = new StringAndInt(key, tagAndFrequency.get(key));
@@ -116,7 +116,8 @@ public class Question2_2 {
 			}
 			for (String key : tagAndFrequency.keySet()) {
 				freq = tagAndFrequency.get(key);
-				value=new StringAndInt(key,freq);
+				value = new StringAndInt(key, freq);
+				System.out.println(country.toString() + " " + value);
 				context.write(country, value);
 			}
 		}
@@ -138,7 +139,6 @@ public class Question2_2 {
 		job.setMapOutputValueClass(StringAndInt.class);
 
 		job.setCombinerClass(MyCombiner.class);
-		job.setNumReduceTasks(3);
 
 		job.setReducerClass(MyReducer.class);
 		job.setOutputKeyClass(Text.class);

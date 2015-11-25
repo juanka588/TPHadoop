@@ -40,10 +40,7 @@ public class StringAndInt  implements WritableComparable<StringAndInt> {
 
 	@Override
 	public int compareTo(StringAndInt o) {
-		if(o.getStringContent().compareTo(this.getStringContent())==0){
-			return o.getIntContent()-this.getIntContent();
-		}
-		return o.getStringContent().compareTo(this.getStringContent());
+		return o.getIntContent()-this.getIntContent();
 	}
 	
 	/**

@@ -167,7 +167,7 @@ public class Question3_1 {
 		job2.setMapOutputKeyClass(StringAndInt.class);
 		job2.setMapOutputValueClass(Text.class);
 
-		job2.setGroupingComparatorClass(FrequenceComparator.class);
+		job2.setGroupingComparatorClass(CountryComparator.class);
 		job2.setSortComparatorClass(SortComparator.class);
 
 		job2.setReducerClass(MyReducer2.class);
